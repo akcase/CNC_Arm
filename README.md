@@ -1,1 +1,1 @@
-# CNC_Arm
+# PortaGuide: A CNC-capable robot arm
