@@ -4,87 +4,113 @@
 #include <freertos/task.h>
 #include <Arduino.h>
 
-#define GRN_LED 1
-#define YLW_LED 2
-#define WHT_LED 42
 
-bool green_led_on = true;
-bool yellow_led_on = false;
-bool white_led_on = false;
+//Motor 1: Outer Shaft
+#define INPUT_1 2
+#define INPUT_2 1
+#define ENABLE_1 42
 
-void green_led_task(void *pvParameters)
-{
-  TickType_t xLastWakeTimeGreen;
-  xLastWakeTimeGreen = xTaskGetTickCount();
-  for (;;)
+//Motor 2: Inner Shaft
+#define INPUT_3 5
+#define INPUT_4 6
+#define ENABLE_2 7
+
+#define MTR_1_SPEED 115
+#define MTR_2_SPEED 125
+
+bool mtr_1_clockwise = false;
+bool mtr_1_counterclockwise = false;
+bool mtr_2_clockwise = false;
+bool mtr_2_counterclockwise = false;
+
+
+
+  void mtr_1_task(void *pvParamters)
   {
-    xTaskDelayUntil(&xLastWakeTimeGreen, 100 / portTICK_PERIOD_MS);
-    if (green_led_on)
+    TickType_t xLastWakeTimeMTR_1;
+    xLastWakeTimeMTR_1 = xTaskGetTickCount();
+
+    for(;;)
     {
-      digitalWrite(GRN_LED, LOW);
-      green_led_on = false;
-    }
-    else
-    {
-      digitalWrite(GRN_LED, HIGH);
-      green_led_on = true;
+      xTaskDelayUntil(&xLastWakeTimeMTR_1, 4500/portTICK_PERIOD_MS);
+      //clockwise direction
+      digitalWrite(INPUT_1, HIGH);
+      digitalWrite(INPUT_2, LOW);
+      analogWrite(ENABLE_1, MTR_1_SPEED);
+
+      xTaskDelayUntil(&xLastWakeTimeMTR_1, 4500/portTICK_PERIOD_MS);
+      //counter-clockwise direction
+      digitalWrite(INPUT_1, LOW);
+      digitalWrite(INPUT_2, HIGH);
+      analogWrite(ENABLE_1, MTR_1_SPEED);
+      
     }
   }
-}
 
-void yellow_led_task(void *pvParameters)
-{
-  TickType_t xLastWakeTimeYellow;
-  xLastWakeTimeYellow = xTaskGetTickCount();
-  for (;;)
+
+
+  void mtr_2_task(void *pvParamters)
   {
-    xTaskDelayUntil(&xLastWakeTimeYellow, 50 / portTICK_PERIOD_MS);
-    if (yellow_led_on)
+    TickType_t xLastWakeTimeMTR_1;
+    xLastWakeTimeMTR_1 = xTaskGetTickCount();
+
+    for(;;)
     {
-      digitalWrite(YLW_LED, LOW);
-      yellow_led_on = false;
-    }
-    else
-    {
-      digitalWrite(YLW_LED, HIGH);
-      yellow_led_on = true;
+      xTaskDelayUntil(&xLastWakeTimeMTR_1, 3500/portTICK_PERIOD_MS);
+      //clockwise direction
+      digitalWrite(INPUT_3, HIGH);
+      digitalWrite(INPUT_4, LOW);
+      analogWrite(ENABLE_2, MTR_2_SPEED);
+
+      xTaskDelayUntil(&xLastWakeTimeMTR_1, 3500/portTICK_PERIOD_MS);
+      //counter-clockwise direction
+      digitalWrite(INPUT_3, LOW);
+      digitalWrite(INPUT_4, HIGH);
+      analogWrite(ENABLE_2, MTR_2_SPEED);
+      
     }
   }
-}
 
-void white_led_task(void *pvParameters)
-{
-  TickType_t xLastWakeTimeWhite;
-  xLastWakeTimeWhite = xTaskGetTickCount();
-  for (;;)
-  {
-    xTaskDelayUntil(&xLastWakeTimeWhite, 1000 / portTICK_PERIOD_MS);
-    if (white_led_on)
-    {
-      digitalWrite(WHT_LED, LOW);
-      white_led_on = false;
-    }
-    else
-    {
-      digitalWrite(WHT_LED, HIGH);
-      white_led_on = true;
-    }
-  }
-}
+
+
 
 void setup()
 {
-  pinMode(GRN_LED, OUTPUT);
-  pinMode(YLW_LED, OUTPUT);
-  pinMode(WHT_LED, OUTPUT);
 
-  digitalWrite(GRN_LED, HIGH);
-  digitalWrite(YLW_LED, LOW);
-  digitalWrite(WHT_LED, LOW);
+  //Motor-1: Outer
+  pinMode(INPUT_1, OUTPUT); // gnd or +v for direction
+  pinMode(INPUT_2, OUTPUT); // gnd or +v for direction
+  pinMode(ENABLE_1, OUTPUT); // motor speed
 
-  xTaskCreate(green_led_task, "Green LED Task", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(yellow_led_task, "Yellow LED Task", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
-  xTaskCreate(white_led_task, "White LED Task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+  //Motor-2: Inner
+  pinMode(INPUT_3, OUTPUT); // gnd or +v for direction
+  pinMode(INPUT_4, OUTPUT); // gnd or +v for direction
+  pinMode(ENABLE_2, OUTPUT); // motor speed
+
+
+
+  //set all signals to low for no motor movement
+  digitalWrite(INPUT_1, LOW);
+  digitalWrite(INPUT_2, LOW);
+  digitalWrite(INPUT_1, LOW);
+  digitalWrite(INPUT_2, LOW);
+
+  xTaskCreate(mtr_1_task, "Motor 1 Task", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+  xTaskCreate(mtr_2_task, "Motor 2 Task", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+
+
+  ///Motor Control test
+  //test motor functionality in one direction-MTR1
+  // analogWrite(ENABLE_1, 125);
+  // digitalWrite(INPUT_1, HIGH);
+  // digitalWrite(INPUT_2, LOW);
+
+  //test motor functionality in one direction-MTR2
+  // analogWrite(ENABLE_2, 125);
+  // digitalWrite(INPUT_1, HIGH);
+  // digitalWrite(INPUT_2, LOW);
+
+
 
   while (1);
 }
