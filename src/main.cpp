@@ -112,10 +112,11 @@ void setup()
 
 
 
-  while (1);
+  while (1)
+  {
+  }
 }
 
 void loop()
 {
-  
 }
