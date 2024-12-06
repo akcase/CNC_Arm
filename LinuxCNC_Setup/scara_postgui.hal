@@ -1,0 +1,11 @@
+net :j0 <= joint.0.pos-fb => pyvcp.joint0 => scaragui.joint0
+net :j1 <= joint.1.pos-fb => pyvcp.joint1 => scaragui.joint1
+
+
+net :kinstype.is-0 <= kinstype.is-0 => pyvcp.multilabel.0.legend0
+net :kinstype.is-1 <= kinstype.is-1 => pyvcp.multilabel.0.legend1
+net :kinstype.is-2 <= kinstype.is-2 => pyvcp.multilabel.0.legend2
+
+net :vismach-clear <= pyvcp.vismach-clear => vismach.plotclear
+
+
